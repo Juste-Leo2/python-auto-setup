@@ -2,90 +2,90 @@
 setlocal
 
 :: =============================================================================
-::      INITIALISATION DE L'ENVIRONNEMENT DE DEVELOPPEMENT
+::      DEVELOPMENT ENVIRONMENT INITIALIZATION
 :: =============================================================================
 echo.
 
-REM --- Etape 1: Verification des pre-requis ---
-echo [1/5] Verification des pre-requis...
+REM --- Step 1: Checking prerequisites ---
+echo [1/5] Checking prerequisites...
 if not exist "requirements.txt" (
-    echo ECHEC: Le fichier 'requirements.txt' est introuvable.
+    echo FAILURE: The 'requirements.txt' file could not be found.
     goto:error
 )
-echo    [OK] Fichier requirements.txt trouve.
+echo    [OK] requirements.txt file found.
 
-REM --- Etape 2: Verification et installation de 'uv' ---
-echo [2/5] Verification et installation de 'uv'...
+REM --- Step 2: Checking for and installing 'uv' ---
+echo [2/5] Checking for and installing 'uv'...
 
-REM On verifie si la commande 'uv' existe deja
+REM Check if the 'uv' command already exists
 where uv > nul 2>&1
 if %errorlevel% == 0 (
-    echo    [OK] uv est deja installe.
+    echo    [OK] uv is already installed.
 ) else (
-    echo    uv non trouve, lancement de l'installation...
+    echo    uv not found, starting installation...
     powershell -ExecutionPolicy ByPass -Command "irm https://astral.sh/uv/install.ps1 | iex"
     if %errorlevel% neq 0 (
-        echo ECHEC: Impossible d'installer uv. Verifiez votre connexion internet ou les permissions PowerShell.
+        echo FAILURE: Could not install uv. Check your internet connection or PowerShell permissions.
         goto:error
     )
     
-    REM On verifie que l'installation a bien ajoute uv au PATH
+    REM Check if the installation successfully added uv to the PATH
     where uv > nul 2>&1
     if %errorlevel% neq 0 (
-        echo ECHEC: uv a ete installe mais n'est pas accessible. Vous devrez peut-etre redemarrer votre terminal.
+        echo FAILURE: uv was installed but is not accessible. You might need to restart your terminal.
         goto:error
     )
-    echo    [OK] uv installe avec succes.
+    echo    [OK] uv installed successfully.
 )
 
 
-REM --- Etape 3: Creation de l'environnement Python ---
-echo [3/5] Creation de l'environnement Python (python 3.11)...
+REM --- Step 3: Creating the Python environment ---
+echo [3/5] Creating the Python environment (python 3.11)...
 uv venv -p 3.11
 if %errorlevel% neq 0 (
-    echo ECHEC: Impossible de creer l'environnement Python. Verifiez que Python 3.11 est accessible.
+    echo FAILURE: Could not create the Python environment. Make sure Python 3.11 is accessible.
     goto:error
 )
-echo    [OK] Environnement Python cree dans le dossier .venv.
+echo    [OK] Python environment created in the .venv folder.
 
-REM --- Etape 4: Activation et installation des dependances ---
-echo [4/5] Installation des dependances Python...
+REM --- Step 4: Activating and installing dependencies ---
+echo [4/5] Installing Python dependencies...
 
-REM Verification que le script d'activation existe
+REM Check that the activation script exists
 if not exist ".\.venv\Scripts\activate.bat" (
-    echo ECHEC: Le script d'activation de l'environnement n'a pas ete trouve.
+    echo FAILURE: The environment activation script was not found.
     goto:error
 )
 
 call .\.venv\Scripts\activate.bat
 if %errorlevel% neq 0 (
-    echo ECHEC: Impossible d'activer l'environnement virtuel.
+    echo FAILURE: Could not activate the virtual environment.
     goto:error
 )
 
 uv pip install -r requirements.txt
 if %errorlevel% neq 0 (
-    echo ECHEC: Impossible d'installer les dependances depuis requirements.txt.
+    echo FAILURE: Could not install dependencies from requirements.txt.
     call .\.venv\Scripts\deactivate.bat
     goto:error
 )
 
-echo    [OK] Dependances Python installees.
+echo    [OK] Python dependencies installed.
 
-REM --- Etape 5: Nettoyage et finalisation ---
-echo [5/5] Finalisation de l'installation...
+REM --- Step 5: Cleanup and finalization ---
+echo [5/5] Finalizing the installation...
 call .\.venv\Scripts\deactivate.bat
-echo    [OK] Environnement desactive.
+echo    [OK] Environment deactivated.
 goto:success
 
 
 :success
 echo.
 echo ==========================================================
-echo      ENVIRONNEMENT CONFIGURE AVEC SUCCES !
+echo      ENVIRONMENT CONFIGURED SUCCESSFULLY!
 echo ==========================================================
 echo.
-echo Pour activer l'environnement, executez la commande :
+echo To activate the environment, run the command:
 echo   call .\.venv\Scripts\activate.bat
 echo.
 goto:end
@@ -94,9 +94,9 @@ goto:end
 :error
 echo.
 echo ==========================================================
-echo      ERREUR: L'INSTALLATION A ECHOUE.
+echo      ERROR: THE INSTALLATION FAILED.
 echo ==========================================================
-echo Veuillez verifier les messages d'erreur ci-dessus.
+echo Please check the error messages above.
 echo.
 set "EXIT_CODE=1"
 goto:end
@@ -104,6 +104,6 @@ goto:end
 
 :end
 endlocal
-echo Appuyez sur une touche pour quitter...
+echo Press any key to exit...
 pause > nul
 exit /b %EXIT_CODE%

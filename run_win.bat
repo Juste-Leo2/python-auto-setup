@@ -1,21 +1,22 @@
 @echo off
 setlocal
 
-REM Verifie si le dossier de l'environnement virtuel existe.
-REM S'il n'existe pas, l'installation n'a probablement pas ete faite.
+REM Check if the virtual environment folder exists.
+REM If it doesn't exist, the setup was probably not run.
 set "UV_EXE=%USERPROFILE%\.local\bin\uv.exe"
 if not exist ".venv" (
-    echo Erreur: L'environnement Python n'a pas ete trouve.
-    echo Veuillez d'abord executer 'setup.bat' pour effectuer l'installation.
+    echo Error: The Python environment was not found.
+    echo Please run 'setup.bat' first to complete the installation.
     pause
     exit /b 1
 )
 
-echo Activation de l'environnement Python...
+echo Activating the Python environment...
 call .\.venv\Scripts\activate.bat
 
-echo Lancement...
+echo Launching...
 "%UV_EXE%" run main.py
 
-echo Fermeture...
+echo Closing...
 call .\.venv\Scripts\deactivate.bat
+pause
